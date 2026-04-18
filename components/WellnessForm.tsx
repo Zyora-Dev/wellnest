@@ -10,7 +10,6 @@ import {
   CheckCircle2,
   Loader2,
   Heart,
-  AlertTriangle,
   Phone,
   ShieldCheck,
   Clock,
@@ -26,7 +25,6 @@ import {
   mentalHealthFormSchema,
   type MentalHealthFormValues,
   SECTION_FIELDS,
-  detectDistressSignals,
 } from "@/lib/schema"
 import {
   Form,
@@ -175,7 +173,6 @@ export default function MentalHealthForm() {
   const [direction, setDirection] = useState(1)
   const [submitted, setSubmitted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [showDistressAlert, setShowDistressAlert] = useState(false)
 
   const form = useForm<MentalHealthFormValues>({
     resolver: zodResolver(mentalHealthFormSchema),
@@ -207,16 +204,11 @@ export default function MentalHealthForm() {
     },
   })
 
-  const watchedValues = form.watch()
-
   const goNext = async () => {
     const fields = SECTION_FIELDS[section] as (keyof MentalHealthFormValues)[]
     if (fields.length > 0) {
       const valid = await form.trigger(fields)
       if (!valid) return
-    }
-    if (detectDistressSignals(watchedValues)) {
-      setShowDistressAlert(true)
     }
     setDirection(1)
     setSection((s) => Math.min(s + 1, TOTAL))
@@ -387,30 +379,10 @@ export default function MentalHealthForm() {
             professional.
           </p>
         </motion.div>
-        {detectDistressSignals(watchedValues) && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.55 }}
-            className="w-full rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 p-4 text-sm text-amber-800 dark:text-amber-300 text-left"
-          >
-            <div className="flex gap-2 items-start">
-              <Phone className="h-4 w-4 mt-0.5 shrink-0" />
-              <div>
-                <p className="font-semibold mb-1">You&apos;re not alone.</p>
-                <p>
-                  If you&apos;re feeling overwhelmed, consider calling a helpline
-                  such as <strong>iCall: 9152987821</strong> or{" "}
-                  <strong>Wellnest Foundation: 94898 80194</strong>.
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        )}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.55 }}
         >
           <Button
             variant="outline"
@@ -419,7 +391,6 @@ export default function MentalHealthForm() {
               form.reset()
               setSection(1)
               setSubmitted(false)
-              setShowDistressAlert(false)
               setShowWelcome(true)
             }}
           >
@@ -490,34 +461,6 @@ export default function MentalHealthForm() {
           ))}
         </div>
       </div>
-
-      {/* Distress alert (inline, while filling) */}
-      <AnimatePresence>
-        {showDistressAlert && (
-          <motion.div
-            key="distress"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mx-4 sm:mx-6 overflow-hidden"
-          >
-            <div className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-3 sm:px-4 py-3 text-xs text-amber-800 dark:text-amber-300 mb-2">
-              <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
-              <span>
-                We noticed some signs of difficulty. You&apos;re not alone —
-                consider speaking with someone you trust or a professional.{" "}
-                <button
-                  type="button"
-                  onClick={() => setShowDistressAlert(false)}
-                  className="underline font-medium"
-                >
-                  Dismiss
-                </button>
-              </span>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Form body */}
       <Form {...form}>
