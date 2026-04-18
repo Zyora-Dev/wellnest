@@ -26,7 +26,12 @@ function _initSchema(db: Database.Database): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS submissions (
       id                       TEXT    PRIMARY KEY,
-      -- Section 1
+      -- Personal Info
+      name                     TEXT    NOT NULL,
+      email                    TEXT    NOT NULL,
+      mobile                   TEXT    NOT NULL,
+      date_of_birth            TEXT    NOT NULL,
+      -- Section 2
       overall_wellbeing        TEXT    NOT NULL,
       stress_frequency         TEXT    NOT NULL,
       energy_levels            TEXT    NOT NULL,

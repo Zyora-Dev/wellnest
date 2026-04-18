@@ -1,6 +1,23 @@
 import { z } from "zod"
 
-// ─── Section 1: Basic Wellbeing ───────────────────────────────────────────────
+// ─── Section 1: Personal Information ──────────────────────────────────────────
+const personalInfoSchema = z.object({
+  name: z
+    .string()
+    .min(2, "Name must be at least 2 characters")
+    .max(100, "Name must be under 100 characters"),
+  email: z
+    .string()
+    .email("Please enter a valid email address"),
+  mobile: z
+    .string()
+    .regex(/^[0-9]{10}$/, "Please enter a valid 10-digit mobile number"),
+  dateOfBirth: z
+    .string()
+    .min(1, "Please enter your date of birth"),
+})
+
+// ─── Section 2: Basic Wellbeing ───────────────────────────────────────────────
 const basicWellbeingSchema = z.object({
   overallWellbeing: z.enum(
     ["very_good", "good", "neutral", "poor", "very_poor"],
@@ -103,7 +120,8 @@ const reflectionSchema = z.object({
 })
 
 // ─── Combined Schema ──────────────────────────────────────────────────────────
-export const mentalHealthFormSchema = basicWellbeingSchema
+export const mentalHealthFormSchema = personalInfoSchema
+  .merge(basicWellbeingSchema)
   .merge(emotionalStateSchema)
   .merge(sleepLifestyleSchema)
   .merge(focusProductivitySchema)
@@ -117,14 +135,15 @@ export type MentalHealthFormValues = z.infer<typeof mentalHealthFormSchema>
 // Per-section field lists for step-by-step validation
 export const SECTION_FIELDS: Record<number, (keyof MentalHealthFormValues)[]> =
   {
-    1: ["overallWellbeing", "stressFrequency", "energyLevels"],
-    2: ["anxietyFrequency", "lowMoodFrequency", "relaxationDifficulty"],
-    3: ["sleepQuality", "sleepHours", "wakeRested"],
-    4: ["concentrationIssues", "productivityLevel"],
-    5: ["comfortSharing", "supportSystem", "lonelinessFrequency"],
-    6: ["copingMethods", "relaxationActivities"],
-    7: [], // all optional
-    8: ["thoughts"],
+    1: ["name", "email", "mobile", "dateOfBirth"],
+    2: ["overallWellbeing", "stressFrequency", "energyLevels"],
+    3: ["anxietyFrequency", "lowMoodFrequency", "relaxationDifficulty"],
+    4: ["sleepQuality", "sleepHours", "wakeRested"],
+    5: ["concentrationIssues", "productivityLevel"],
+    6: ["comfortSharing", "supportSystem", "lonelinessFrequency"],
+    7: ["copingMethods", "relaxationActivities"],
+    8: [], // all optional
+    9: ["thoughts"],
   }
 
 // ─── Human-readable label maps ────────────────────────────────────────────────

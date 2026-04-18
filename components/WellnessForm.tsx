@@ -12,6 +12,13 @@ import {
   Heart,
   AlertTriangle,
   Phone,
+  ShieldCheck,
+  Clock,
+  Lock,
+  Sparkles,
+  User,
+  Mail,
+  Calendar,
 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -38,6 +45,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 
@@ -111,21 +119,21 @@ function PillRadio({
     cols === 4
       ? "grid-cols-2 sm:grid-cols-4"
       : cols === 3
-      ? "grid-cols-3"
+      ? "grid-cols-2 sm:grid-cols-3"
       : "grid-cols-2"
 
   return (
     <RadioGroup
       onValueChange={onChange}
       defaultValue={value}
-      className={`grid ${gridCols} gap-2`}
+      className={`grid ${gridCols} gap-3`}
     >
       {options.map((opt) => (
         <Label
           key={opt.value}
           htmlFor={`${name}-${opt.value}`}
           className={[
-            "flex items-center justify-center rounded-xl border px-3 py-2.5 cursor-pointer text-sm font-medium transition-all duration-200 text-center leading-snug",
+            "flex items-center justify-center rounded-xl border px-3 py-2.5 sm:px-4 sm:py-3 cursor-pointer text-xs sm:text-sm font-medium transition-all duration-200 text-center leading-snug",
             value === opt.value
               ? "border-violet-400 bg-violet-50 text-violet-700 dark:bg-violet-950/50 dark:text-violet-300 dark:border-violet-500"
               : "border-slate-200 bg-white/60 text-slate-600 hover:border-violet-200 hover:bg-violet-50/40 dark:border-slate-700 dark:bg-slate-800/50 dark:text-slate-400 dark:hover:border-violet-700",
@@ -146,6 +154,7 @@ function PillRadio({
 // ─── Section config ───────────────────────────────────────────────────────────
 
 const SECTIONS = [
+  { label: "Personal Information" },
   { label: "Basic Wellbeing" },
   { label: "Emotional State" },
   { label: "Sleep & Lifestyle" },
@@ -161,6 +170,7 @@ const TOTAL = SECTIONS.length
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function MentalHealthForm() {
+  const [showWelcome, setShowWelcome] = useState(true)
   const [section, setSection] = useState(1)
   const [direction, setDirection] = useState(1)
   const [submitted, setSubmitted] = useState(false)
@@ -170,6 +180,10 @@ export default function MentalHealthForm() {
   const form = useForm<MentalHealthFormValues>({
     resolver: zodResolver(mentalHealthFormSchema),
     defaultValues: {
+      name: "",
+      email: "",
+      mobile: "",
+      dateOfBirth: "",
       overallWellbeing: undefined,
       stressFrequency: undefined,
       energyLevels: undefined,
@@ -234,6 +248,112 @@ export default function MentalHealthForm() {
     }
   }
 
+  // ── Welcome screen ──────────────────────────────────────────────────────────
+  if (showWelcome) {
+    return (
+      <motion.div
+        key="welcome"
+        variants={cardVariants}
+        initial="hidden"
+        animate="visible"
+        className="glass-card w-full max-w-lg mx-auto p-6 sm:p-10 flex flex-col items-center text-center"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 16, delay: 0.1 }}
+          className="mb-6"
+        >
+          <div className="h-20 w-20 rounded-full bg-gradient-to-br from-violet-100 to-purple-100 dark:from-violet-900/40 dark:to-purple-900/40 flex items-center justify-center">
+            <Heart className="h-10 w-10 text-violet-500" strokeWidth={1.5} />
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+          className="space-y-3 mb-8"
+        >
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-800 dark:text-slate-100">
+            Welcome to <span className="text-violet-600 dark:text-violet-400">Wellnest</span>
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed max-w-sm mx-auto">
+            A safe space for self-reflection and mental wellness awareness.
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.35, duration: 0.5 }}
+          className="w-full space-y-4 mb-8"
+        >
+          <div className="flex items-start gap-3 sm:gap-4 text-left p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center shrink-0">
+              <Sparkles className="h-4 w-4 sm:h-5 sm:w-5 text-violet-500" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-1 text-sm sm:text-base">What is this survey?</h3>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                A brief mental health check-in to help you reflect on your emotional wellbeing, sleep, stress, and daily habits.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 sm:gap-4 text-left p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center shrink-0">
+              <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-violet-500" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-1 text-sm sm:text-base">How long does it take?</h3>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                About 3–5 minutes. There are 9 short sections with simple questions.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3 sm:gap-4 text-left p-3 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50">
+            <div className="h-9 w-9 sm:h-10 sm:w-10 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center shrink-0">
+              <Lock className="h-4 w-4 sm:h-5 sm:w-5 text-violet-500" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-slate-700 dark:text-slate-200 mb-1 text-sm sm:text-base">Your privacy matters</h3>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                All responses are confidential. This is a self-reflection tool, not a medical diagnosis.
+              </p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+        >
+          <Button
+            onClick={() => setShowWelcome(false)}
+            className="gap-2 bg-violet-600 hover:bg-violet-500 text-white rounded-full px-8 py-6 text-base"
+          >
+            Begin Check-In
+            <ChevronRight className="h-5 w-5" />
+          </Button>
+        </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6 text-xs text-slate-400 dark:text-slate-500"
+        >
+          Remember: If you&apos;re in crisis, please reach out to a trusted person or professional.
+        </motion.p>
+      </motion.div>
+    )
+  }
+
   // ── Success screen ──────────────────────────────────────────────────────────
   if (submitted) {
     return (
@@ -242,14 +362,14 @@ export default function MentalHealthForm() {
         variants={cardVariants}
         initial="hidden"
         animate="visible"
-        className="glass-card w-full max-w-lg mx-auto p-10 flex flex-col items-center text-center gap-6"
+        className="glass-card w-full max-w-lg mx-auto p-6 sm:p-10 flex flex-col items-center text-center gap-5 sm:gap-6"
       >
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 16, delay: 0.1 }}
         >
-          <CheckCircle2 className="h-16 w-16 text-violet-500" strokeWidth={1.5} />
+          <CheckCircle2 className="h-12 w-12 sm:h-16 sm:w-16 text-violet-500" strokeWidth={1.5} />
         </motion.div>
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -257,7 +377,7 @@ export default function MentalHealthForm() {
           transition={{ delay: 0.3, duration: 0.5 }}
           className="space-y-2"
         >
-          <h2 className="text-2xl font-semibold tracking-tight text-slate-800 dark:text-slate-100">
+          <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-slate-800 dark:text-slate-100">
             Thank you for sharing.
           </h2>
           <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-sm mx-auto">
@@ -281,7 +401,7 @@ export default function MentalHealthForm() {
                 <p>
                   If you&apos;re feeling overwhelmed, consider calling a helpline
                   such as <strong>iCall: 9152987821</strong> or{" "}
-                  <strong>Vandrevala Foundation: 1860-2662-345</strong>.
+                  <strong>Wellnest Foundation: 94898 80194</strong>.
                 </p>
               </div>
             </div>
@@ -300,6 +420,7 @@ export default function MentalHealthForm() {
               setSection(1)
               setSubmitted(false)
               setShowDistressAlert(false)
+              setShowWelcome(true)
             }}
           >
             Start a new response
@@ -318,9 +439,9 @@ export default function MentalHealthForm() {
       className="glass-card w-full max-w-lg mx-auto overflow-hidden"
     >
       {/* Disclaimer banner */}
-      <div className="px-6 pt-5 pb-0">
+      <div className="px-4 sm:px-6 pt-4 sm:pt-5 pb-0">
         <div className="flex items-start gap-2 rounded-xl border border-violet-100 dark:border-violet-900/50 bg-violet-50/60 dark:bg-violet-950/30 px-4 py-3 text-xs text-violet-700 dark:text-violet-400">
-          <Heart className="h-3.5 w-3.5 mt-0.5 shrink-0" />
+          <ShieldCheck className="h-3.5 w-3.5 mt-0.5 shrink-0" />
           <span>
             This form is a <strong>self-reflection tool</strong>, not a medical
             diagnosis. Your answers are confidential.
@@ -329,8 +450,8 @@ export default function MentalHealthForm() {
       </div>
 
       {/* Header */}
-      <div className="px-8 pt-5 pb-3">
-        <div className="flex items-center gap-2 mb-1">
+      <div className="px-4 sm:px-8 pt-5 sm:pt-6 pb-3 sm:pb-4">
+        <div className="flex items-center gap-2 mb-2">
           <Heart className="h-4 w-4 text-violet-500" strokeWidth={1.5} />
           <span className="text-[11px] font-semibold tracking-widest uppercase text-slate-400 dark:text-slate-500">
             Wellnest
@@ -339,12 +460,12 @@ export default function MentalHealthForm() {
         <h1 className="text-xl font-semibold tracking-tight text-slate-800 dark:text-slate-100">
           Mental Health Check-In
         </h1>
-        <p className="text-sm text-slate-400 dark:text-slate-500 mt-0.5">
+        <p className="text-sm text-slate-400 dark:text-slate-500 mt-1">
           Section {section} of {TOTAL} — {SECTIONS[section - 1].label}
         </p>
 
         {/* Progress bar */}
-        <div className="mt-3 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+        <div className="mt-4 h-1.5 w-full rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-violet-400 to-purple-500"
             animate={{ width: `${(section / TOTAL) * 100}%` }}
@@ -353,7 +474,7 @@ export default function MentalHealthForm() {
         </div>
 
         {/* Step dots */}
-        <div className="flex items-center gap-1.5 mt-2">
+        <div className="flex items-center gap-1.5 mt-3">
           {SECTIONS.map((_, i) => (
             <div
               key={i}
@@ -378,9 +499,9 @@ export default function MentalHealthForm() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="mx-6 overflow-hidden"
+            className="mx-4 sm:mx-6 overflow-hidden"
           >
-            <div className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-4 py-3 text-xs text-amber-800 dark:text-amber-300 mb-2">
+            <div className="flex items-start gap-2 rounded-xl border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 px-3 sm:px-4 py-3 text-xs text-amber-800 dark:text-amber-300 mb-2">
               <AlertTriangle className="h-3.5 w-3.5 mt-0.5 shrink-0" />
               <span>
                 We noticed some signs of difficulty. You&apos;re not alone —
@@ -400,14 +521,97 @@ export default function MentalHealthForm() {
 
       {/* Form body */}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="px-8 pb-8">
-          <div className="relative min-h-[340px] overflow-hidden flex flex-col justify-between">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="px-4 sm:px-8 pt-2 pb-6 sm:pb-8">
+          <div className="relative min-h-[340px] sm:min-h-[360px] overflow-hidden flex flex-col justify-between">
             <AnimatePresence mode="wait" custom={direction}>
 
-              {/* Section 1 */}
+              {/* Section 1 - Personal Information */}
               {section === 1 && (
                 <motion.div key="s1" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
-                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5 pt-2">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
+                    <motion.div variants={fadeUp}>
+                      <FormField control={form.control} name="name" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                              <Input
+                                placeholder="Enter your full name"
+                                className="pl-10 bg-white/60 dark:bg-slate-800/60"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </motion.div>
+                    <motion.div variants={fadeUp}>
+                      <FormField control={form.control} name="email" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email Address</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                              <Input
+                                type="email"
+                                placeholder="you@example.com"
+                                className="pl-10 bg-white/60 dark:bg-slate-800/60"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </motion.div>
+                    <motion.div variants={fadeUp}>
+                      <FormField control={form.control} name="mobile" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Mobile Number</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                              <Input
+                                type="tel"
+                                placeholder="10-digit mobile number"
+                                maxLength={10}
+                                className="pl-10 bg-white/60 dark:bg-slate-800/60"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </motion.div>
+                    <motion.div variants={fadeUp}>
+                      <FormField control={form.control} name="dateOfBirth" render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date of Birth</FormLabel>
+                          <FormControl>
+                            <div className="relative">
+                              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                              <Input
+                                type="date"
+                                className="pl-10 bg-white/60 dark:bg-slate-800/60"
+                                {...field}
+                              />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )} />
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              )}
+
+              {/* Section 2 - Basic Wellbeing */}
+              {section === 2 && (
+                <motion.div key="s2" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
                     <motion.div variants={fadeUp}>
                       <FormField control={form.control} name="overallWellbeing" render={({ field }) => (
                         <FormItem>
@@ -468,10 +672,10 @@ export default function MentalHealthForm() {
                 </motion.div>
               )}
 
-              {/* Section 2 */}
-              {section === 2 && (
-                <motion.div key="s2" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
-                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5 pt-2">
+              {/* Section 3 - Emotional State */}
+              {section === 3 && (
+                <motion.div key="s3" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
                     <motion.div variants={fadeUp}>
                       <FormField control={form.control} name="anxietyFrequency" render={({ field }) => (
                         <FormItem>
@@ -532,10 +736,10 @@ export default function MentalHealthForm() {
                 </motion.div>
               )}
 
-              {/* Section 3 */}
-              {section === 3 && (
-                <motion.div key="s3" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
-                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5 pt-2">
+              {/* Section 4 - Sleep & Lifestyle */}
+              {section === 4 && (
+                <motion.div key="s4" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
                     <motion.div variants={fadeUp}>
                       <FormField control={form.control} name="sleepQuality" render={({ field }) => (
                         <FormItem>
@@ -595,10 +799,10 @@ export default function MentalHealthForm() {
                 </motion.div>
               )}
 
-              {/* Section 4 */}
-              {section === 4 && (
-                <motion.div key="s4" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
-                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5 pt-2">
+              {/* Section 5 - Focus & Productivity */}
+              {section === 5 && (
+                <motion.div key="s5" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
                     <motion.div variants={fadeUp}>
                       <FormField control={form.control} name="concentrationIssues" render={({ field }) => (
                         <FormItem>
@@ -642,10 +846,10 @@ export default function MentalHealthForm() {
                 </motion.div>
               )}
 
-              {/* Section 5 */}
-              {section === 5 && (
-                <motion.div key="s5" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
-                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5 pt-2">
+              {/* Section 6 - Social & Support */}
+              {section === 6 && (
+                <motion.div key="s6" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
                     <motion.div variants={fadeUp}>
                       <FormField control={form.control} name="comfortSharing" render={({ field }) => (
                         <FormItem>
@@ -704,10 +908,10 @@ export default function MentalHealthForm() {
                 </motion.div>
               )}
 
-              {/* Section 6 */}
-              {section === 6 && (
-                <motion.div key="s6" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
-                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5 pt-2">
+              {/* Section 7 - Coping & Habits */}
+              {section === 7 && (
+                <motion.div key="s7" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
                     <motion.div variants={fadeUp}>
                       <FormField control={form.control} name="copingMethods" render={({ field }) => (
                         <FormItem>
@@ -748,10 +952,10 @@ export default function MentalHealthForm() {
                 </motion.div>
               )}
 
-              {/* Section 7 */}
-              {section === 7 && (
-                <motion.div key="s7" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
-                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5 pt-2">
+              {/* Section 8 - Check-In */}
+              {section === 8 && (
+                <motion.div key="s8" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
                     <motion.div variants={fadeUp}>
                       <p className="text-xs text-slate-400 dark:text-slate-500 italic">
                         These questions are completely optional.
@@ -797,10 +1001,10 @@ export default function MentalHealthForm() {
                 </motion.div>
               )}
 
-              {/* Section 8 */}
-              {section === 8 && (
-                <motion.div key="s8" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
-                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-5 pt-2">
+              {/* Section 9 - Reflection */}
+              {section === 9 && (
+                <motion.div key="s9" custom={direction} variants={stepVariants} initial="enter" animate="center" exit="exit">
+                  <motion.div variants={stagger} initial="hidden" animate="visible" className="space-y-6 pt-4">
                     <motion.div variants={fadeUp}>
                       <FormField control={form.control} name="thoughts" render={({ field }) => (
                         <FormItem>
@@ -841,7 +1045,7 @@ export default function MentalHealthForm() {
             </AnimatePresence>
 
             {/* Navigation */}
-            <div className="flex items-center justify-between pt-6 mt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="flex items-center justify-between pt-6 mt-4 border-t border-slate-100 dark:border-slate-800">
               <Button
                 type="button"
                 variant="ghost"

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { v4 as uuidv4 } from "uuid"
 import getDb from "@/lib/db"
 import { mentalHealthFormSchema } from "@/lib/schema"
+import { sendAdminNotification } from "@/lib/email"
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,6 +23,7 @@ export async function POST(request: NextRequest) {
     db.prepare(`
       INSERT INTO submissions (
         id,
+        name, email, mobile, date_of_birth,
         overall_wellbeing, stress_frequency, energy_levels,
         anxiety_frequency, low_mood_frequency, relaxation_difficulty,
         sleep_quality, sleep_hours, wake_rested,
@@ -32,6 +34,7 @@ export async function POST(request: NextRequest) {
         thoughts, additional_notes
       ) VALUES (
         @id,
+        @name, @email, @mobile, @dateOfBirth,
         @overallWellbeing, @stressFrequency, @energyLevels,
         @anxietyFrequency, @lowMoodFrequency, @relaxationDifficulty,
         @sleepQuality, @sleepHours, @wakeRested,
@@ -43,6 +46,10 @@ export async function POST(request: NextRequest) {
       )
     `).run({
       id,
+      name: d.name,
+      email: d.email,
+      mobile: d.mobile,
+      dateOfBirth: d.dateOfBirth,
       overallWellbeing: d.overallWellbeing,
       stressFrequency: d.stressFrequency,
       energyLevels: d.energyLevels,
@@ -68,6 +75,11 @@ export async function POST(request: NextRequest) {
           : 0,
       thoughts: d.thoughts,
       additionalNotes: d.additionalNotes ?? null,
+    })
+
+    // Send admin notification email (non-blocking)
+    sendAdminNotification(id, d).catch((err) => {
+      console.error("[POST /api/submit] Email notification failed:", err)
     })
 
     return NextResponse.json({ success: true, id }, { status: 201 })
